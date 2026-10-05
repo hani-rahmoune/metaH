@@ -1,19 +1,11 @@
 # construction.jl
 
-function construction(C, A)                        
+
+
+function construction(C, A,note)                        
     m,n =size(A)    # rows x cols                              
     x=zeros(Int, n)    # an array of zeros                           
     ligneUtilisee= zeros(Int, m)    # 0 for not used 1 for used               
- 
-    note =zeros(n)    # cost                             
-    for j = 1:n                                    
-        poids =sum(A[:, j]) # since its binary it returns how many times it appears or how many lines are covered 
-        if poids>0
-            note[j]= C[j]/poids # cost/lines covered
-        else
-            note[j]=0.0              
-        end
-    end
  
     ordre=sortperm(note,rev=true)     #order them by index for the first example it will be [6,7,1,4...]         
  
@@ -38,8 +30,22 @@ function construction(C, A)
     z = sum(C[j] * x[j] for j = 1:n)  # returning the dot product z0 dot(C,x)            
     return x, z                                    
 end
- 
-C, A = loadSPP("Data/pb_500rnd0100.dat")                     
-x, z = construction(C, A)                          
-println("x = ", x)                                 
-println("z = ", z)
+
+function constructionCostOnly(C,A)
+    return construction(C,A,C)
+end
+
+
+function constructionRatio(C,A)
+    m,n = size(A)
+    note =zeros(n)    # cost for each element                          
+    for j = 1:n                                    
+        poids =sum(A[:, j]) # since its binary it returns how many times it appears or how many lines are covered 
+        if poids>0
+            note[j]= C[j]/poids # cost/lines covered
+        else
+            note[j]=0.0              
+        end
+    end
+    return construction(C,A,note)
+end

@@ -1,6 +1,7 @@
 using LinearAlgebra
 include("loadSPP.jl")
-include("question2.jl")   # includes constructSPP.jl itself
+#include("question2.jl")   # includes constructSPP.jl itself
+include("rechercheLocale.jl")
 
 
 
@@ -21,12 +22,12 @@ for fname in instances
     C, A = loadSPP(fname)
 
     # Q1 : construction (reference)
-    t1 = @elapsed (x1, z1) = greedyOnlyCost(A, C)
-    t2 = @elapsed (x2, z2) = greedyRatio(A, C)
+    t1 = @elapsed (x1, z1) = constructionCostOnly(C, A)
+    t2 = @elapsed (x2, z2) = constructionRatio(C, A)
 
     # Q2 : recherche locale (question2.jl)
-    ts = @elapsed (xs, zs) = descentSimple(A, C)
-    td = @elapsed (xd, zd) = deepDescent(A, C)
+    ts = @elapsed (xs, zs) =descenteSimple(C, A)
+    td = @elapsed (xd, zd) = deepDescent(C, A)
 
     println(fname)
     println("  construction cost only : z0 = ", z1, " (", round(t1, digits=5), "s)")
