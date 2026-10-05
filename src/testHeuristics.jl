@@ -18,6 +18,10 @@ instances = joinpath.(datdir, ["didactic.dat",
                                "pb_1000rnd0100.dat",
                                "pb_2000rnd0100.dat"])
 
+mkpath(joinpath(@__DIR__, "..", "res")) #create if the res doesnt exists 
+out = open(joinpath(@__DIR__, "..", "res", "heuristiques.csv"), "w") #open output file csv 
+println(out, "instance,z_cost,t_cost,z_ratio,t_ratio,z_simple,t_simple,z_deep,t_deep") #headers 
+
 for fname in instances
     C, A = loadSPP(fname)
 
@@ -34,4 +38,7 @@ for fname in instances
     println("  construction ratio     : z0 = ", z2, " (", round(t2, digits=5), "s)")
     println("  descentSimple (Q2)     : z = ", zs, " (", round(ts, digits=5), "s)") 
     println("  deepDescent (Q2)       : z = ", zd, " (", round(td, digits=5), "s)")
+
+    println(out, basename(fname), ",", z1, ",", t1, ",", z2, ",", t2, ",", zs, ",", ts, ",", zd, ",", td)
 end
+close(out)
