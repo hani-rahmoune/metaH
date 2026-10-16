@@ -2,10 +2,11 @@ using LinearAlgebra
 include("constructSPP.jl")
 
 #for every chosen number we check if theres a number with a higher cost that does not conflict with the other chosen number and doing this for every chosen one afterward 
-function descentSimple(A,C)
-    res,z = greedyRatio(A,C)
+function descentSimple(A,C,res0 = greedyRatio(A,C)[1])
+    res = copy(res0) # this bcz in julia res0 will get updated and when i  call this in test then call deep descent deep descent will use an altered res0
     n,m= size(A)
     rows = getRow(A) #[[1][1,2],[3,4],[4]]
+    edited = false # added this to use it in vnd1
     for j in eachindex(res)
         if res[j] ==1 
             for i in eachindex(C)
@@ -17,6 +18,7 @@ function descentSimple(A,C)
                         end   
                     end
                     if noConflict == true 
+                        edited = true 
                         res[j] = 0 
                         res[i] = 1
                         break
@@ -25,14 +27,14 @@ function descentSimple(A,C)
             end
         end
     end
-    return res,dot(C,res)
+    return res,dot(C,res),edited
 end
 
 
 
 #same logic as the previous one we just try to find a better fit everytime we get a higher score incase some conflict were resolved after the changes were made 
-function deepDescent(A,C)
-    res,z = greedyRatio(A,C)
+function deepDescent(A,C,res0 = greedyRatio(A,C)[1])
+    res = copy(res0)
     n,m= size(A)
     rows = getRow(A) #[[1][1,2],[3,4],[4]]
     betterCost = true 

@@ -7,6 +7,8 @@ A = [
     0 1 1 0 0 0 1 0 1   # element 6
     1 0 0 1 1 0 0 1 1   # element 7
 ]
+C = [10, 5, 8, 6, 9, 13, 11, 4, 6]
+
 n, m = size(A)
 #=
 println(n)
@@ -46,7 +48,6 @@ function constructGreedy(A,C,key)
     end
     return result
 end 
-C = [10, 5, 8, 6, 9, 13, 11, 4, 6]
 
 function GreedyOnlyCost(A,C)
     return constructGreedy(A,C,C)

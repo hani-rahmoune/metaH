@@ -30,8 +30,8 @@ for fname in instances
     t2 = @elapsed (x2, z2) = constructionRatio(C, A)
 
     # Q2 : recherche locale (question2.jl)
-    ts = @elapsed (xs, zs) =descenteSimple(C, A)
-    td = @elapsed (xd, zd) = deepDescent(C, A)
+    ts = @elapsed (xs, zs,_) =descenteSimple(C, A,x2)
+    td = @elapsed (xd, zd) = deepDescent(C, A,x2)
 
     println(fname)
     println("  construction cost only : z0 = ", z1, " (", round(t1, digits=5), "s)")
