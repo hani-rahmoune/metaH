@@ -230,3 +230,88 @@ function graspVnd(A,C,alpha,budget) # 60sec
     end
     return bestRes , bestZ
 end
+
+
+
+
+#trying path relinking 
+#idea : Path relinking walks from a start solution to a target solution. First, collect the variables that are in the target but not in the start (toAdd). Then remove from the start every variable that conflicts with one of them. Next, add the variables of toAdd one at a time, computing the solution value after each addition and saving the best solution seen (bestZ). Once every variable of toAdd has been added, the path has reached the target, and the best solution found along the way is returned. The target is feasible and all conflicting variables were removed, so every intermediate solution stays feasible.
+
+
+function path_Relinking(A,C,start,target)
+    current = copy(start)
+    rows = getRow(A)
+    n,m = size(A)
+    used = zeros(Int,n)
+    for i in eachindex(start) 
+        if(start[i] == 1)
+            for q in rows[i]
+            used[q]+=1 
+            end
+        end
+    end
+
+    best = copy(current)
+    bestZ = dot(best,C)
+
+    toAdd = [i for i in eachindex(current) if target[i] == 1 && current[i] == 0] #exists in the target but not in the start
+    for i in toAdd
+        for j in findall(==(1) , current) # only the indexes that are 1 used ones 
+            if(!isempty(intersect(rows[i],rows[j]))) #remove all the constraints until i can add the i
+                removeSolution(used,current,j,rows)
+            end
+        end
+        addSolution(used,current,i,rows)
+
+        #checking if we have open space after we removed some solution 
+        for k in 1:m
+            if(fits(used,rows,k))
+                addSolution(used,current,k,rows)
+            end
+        end
+
+        #computing the new Z to compare 
+        newZ = dot(current,C)
+        if(newZ>bestZ)
+            bestZ = newZ 
+            best = copy(current)
+        end
+    end
+    return best,bestZ
+end
+
+
+
+function createPool(A,C,alpha,budget = 60)
+    pool = Dict{Vector{Int},Int}()
+    t0 = time()
+    while time()- t0 < budget 
+        res , z = graspRatio(A,C,alpha)
+
+        if(!isempty(pool))
+            target = rand(collect(keys(pool))) # get a random res from pool
+            if(res!= target)
+                if(z > pool[target])
+                    s,t = res , target #start should be the better one 
+                else 
+                   s,t = target ,res 
+                end
+                resLink , zLink = path_Relinking(A,C,s,t)
+                if(zLink > z )
+                    res , z = resLink,zLink
+                end
+            end
+        end
+
+        if(haskey(pool,res)) # just skip do nothing
+        elseif(length(pool)<5) #check if the pool is still not full 
+            pool[copy(res)] = z
+        elseif(minimum(values(pool))<z) # new z is still bigger than the smallest z in the pool so we keep only the best results 
+            delete!(pool, argmin(pool)) # delete the element with min z 
+            pool[copy(res)] = z
+        end
+    end
+    return argmax(pool) , maximum(values(pool))
+
+end
+
