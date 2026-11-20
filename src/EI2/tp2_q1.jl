@@ -1,8 +1,8 @@
 using LinearAlgebra
-include("constructSPP.jl")
-include("loadSPP.jl")
-include("question2.jl")
-fname = joinpath(@__DIR__, "..", "dat", "didactic.dat")
+include(joinpath(@__DIR__, "..", "EI1", "constructSPP.jl"))
+include(joinpath(@__DIR__, "..", "EI1", "loadSPP.jl"))
+include(joinpath(@__DIR__, "..", "EI1", "question2.jl"))
+fname = joinpath(@__DIR__, "..", "..", "dat", "didactic.dat")
 C,A = loadSPP(fname)
 
 function grasp(A,C,alpha,key= C)
@@ -215,7 +215,7 @@ end
 
 
 
-function graspVnd(A,C,alpha,budget) # 60sec
+function graspVnd(A,C,alpha,budget,trace=nothing) # 60sec
     n,m = size(A)
     bestRes = zeros(Int,m)
     bestZ = 0
@@ -227,6 +227,7 @@ function graspVnd(A,C,alpha,budget) # 60sec
             bestZ = z 
             bestRes = res
         end
+        if trace !== nothing; push!(trace, (time()-t0, bestZ)); end
     end
     return bestRes , bestZ
 end
@@ -282,8 +283,9 @@ end
 
 
 
-function createPool(A,C,alpha,budget = 60)
+function createPool(A,C,alpha,budget = 60,poolSize = 5,trace=nothing)
     pool = Dict{Vector{Int},Int}()
+    bestZ = 0
     t0 = time()
     while time()- t0 < budget 
         res , z = graspRatio(A,C,alpha)
@@ -304,12 +306,14 @@ function createPool(A,C,alpha,budget = 60)
         end
 
         if(haskey(pool,res)) # just skip do nothing
-        elseif(length(pool)<5) #check if the pool is still not full 
+        elseif(length(pool)<poolSize) #check if the pool is still not full 
             pool[copy(res)] = z
         elseif(minimum(values(pool))<z) # new z is still bigger than the smallest z in the pool so we keep only the best results 
             delete!(pool, argmin(pool)) # delete the element with min z 
             pool[copy(res)] = z
         end
+        bestZ = max(bestZ, z)
+        if trace !== nothing; push!(trace, (time()-t0, bestZ)); end
     end
     return argmax(pool) , maximum(values(pool))
 

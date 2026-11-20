@@ -15,7 +15,7 @@ include("question2.jl")
 
 # Loading a SPP instance
 println("\nLoading...")
-datdir = normpath(joinpath(@__DIR__, "..", "dat"))   
+datdir = normpath(joinpath(@__DIR__, "..", "..", "dat"))   
 fname = joinpath(datdir, "didactic.dat")
 C, A = loadSPP(fname)
 @show C

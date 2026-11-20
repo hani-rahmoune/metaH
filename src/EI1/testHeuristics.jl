@@ -1,11 +1,10 @@
 using LinearAlgebra
 include("loadSPP.jl")
-#include("question2.jl")   # includes constructSPP.jl itself
-include("rechercheLocale.jl")
+include("question2.jl")   # includes constructSPP.jl itself
 
 
 
-datdir = normpath(joinpath(@__DIR__, "..", "dat"))   # works from any working directory
+datdir = normpath(joinpath(@__DIR__, "..", "..", "dat"))   # works from any working directory
 instances = joinpath.(datdir, ["didactic.dat",
                                "pb_100rnd0100.dat",
                                "pb_100rnd0300.dat",
@@ -18,20 +17,20 @@ instances = joinpath.(datdir, ["didactic.dat",
                                "pb_1000rnd0100.dat",
                                "pb_2000rnd0100.dat"])
 
-mkpath(joinpath(@__DIR__, "..", "res")) #create if the res doesnt exists 
-out = open(joinpath(@__DIR__, "..", "res", "heuristiques.csv"), "w") #open output file csv 
+mkpath(joinpath(@__DIR__, "..", "..", "res")) #create if the res doesnt exists 
+out = open(joinpath(@__DIR__, "..", "..", "res", "heuristiques.csv"), "w") #open output file csv 
 println(out, "instance,z_cost,t_cost,z_ratio,t_ratio,z_simple,t_simple,z_deep,t_deep") #headers 
 
 for fname in instances
     C, A = loadSPP(fname)
 
     # Q1 : construction (reference)
-    t1 = @elapsed (x1, z1) = constructionCostOnly(C, A)
-    t2 = @elapsed (x2, z2) = constructionRatio(C, A)
+    t1 = @elapsed (x1, z1) = greedyOnlyCost(A, C)
+    t2 = @elapsed (x2, z2) = greedyRatio(A, C)
 
     # Q2 : recherche locale (question2.jl)
-    ts = @elapsed (xs, zs,_) =descenteSimple(C, A,x2)
-    td = @elapsed (xd, zd) = deepDescent(C, A,x2)
+    ts = @elapsed (xs, zs, _) = descentSimple(A, C, x2)
+    td = @elapsed (xd, zd) = deepDescent(A, C, x2)
 
     println(fname)
     println("  construction cost only : z0 = ", z1, " (", round(t1, digits=5), "s)")

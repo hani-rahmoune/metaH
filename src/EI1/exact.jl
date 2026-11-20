@@ -4,14 +4,14 @@ using JuMP, GLPK, LinearAlgebra
 include("loadSPP.jl")
 include("setSPP.jl")
 
-datdir = normpath(joinpath(@__DIR__, "..", "dat"))
+datdir = normpath(joinpath(@__DIR__, "..", "..", "dat"))
 instances = ["didactic.dat",
              "pb_100rnd0100.dat", "pb_100rnd0300.dat", "pb_100rnd0500.dat",
              "pb_200rnd0100.dat", "pb_200rnd0900.dat", "pb_200rnd1700.dat",
              "pb_500rnd0100.dat", "pb_500rnd0500.dat",
              "pb_1000rnd0100.dat", "pb_2000rnd0100.dat"]
 
-out = open(joinpath(@__DIR__, "..", "res", "exact.csv"), "w")
+out = open(joinpath(@__DIR__, "..", "..", "res", "exact.csv"), "w")
 println(out, "instance,z_opt,t_solver,status") #headers 
 
 for f in instances

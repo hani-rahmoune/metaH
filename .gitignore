@@ -1,0 +1,11 @@
+.DS_Store
+
+# documents de cours (non redistribuables)
+EJOR_GraspSPP.pdf
+TheseXDelorme.pdf
+consignes EI*.pdf
+
+# brouillons et sources du rapport
+src/old/
+latex/
+latex.zip
